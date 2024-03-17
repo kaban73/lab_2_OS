@@ -2,8 +2,8 @@
 // Created by ivankabanov on 16.03.24.
 //
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "stdio.h"
+#include "stdlib.h"
 #include "task.h"
 #include "list.h"
 
