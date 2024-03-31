@@ -6,6 +6,12 @@
 #include "task.h"
 #include "list.h"
 
+typedef struct {
+    int turnaroundTime;
+    int waitingTime;
+    int responseTime;
+} Metrics;
+
 struct node *head = NULL;
 
 void add(char *name, int priority, int burst) {
@@ -37,10 +43,18 @@ Task *pickTask() {
     }
 }
 
-void schedule() {
+void schedule(Metrics *metrics) {
     Task *task = pickTask();
+    int currentTime = 0;
+
     while (task != NULL) {
+        metrics->responseTime += currentTime;
+
         run(task, task->burst);
+
+        currentTime += task->burst;
+        metrics->turnaroundTime += currentTime;
+
         task = pickTask();
     }
 }
