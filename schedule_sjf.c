@@ -6,12 +6,6 @@
 #include "task.h"
 #include "list.h"
 
-typedef struct {
-    int turnaroundTime;
-    int waitingTime;
-    int responseTime;
-} Metrics;
-
 struct node *head = NULL;
 
 void add(char *name, int priority, int burst) {
