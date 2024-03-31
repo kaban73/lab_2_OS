@@ -16,12 +16,6 @@
 
 #define SIZE    100
 
-typedef struct {
-    int turnaroundTime;
-    int waitingTime;
-    int responseTime;
-} Metrics;
-
 int main(int argc, char *argv[])
 {
     FILE *in;
