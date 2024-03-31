@@ -16,6 +16,12 @@
 
 #define SIZE    100
 
+typedef struct {
+    int turnaroundTime;
+    int waitingTime;
+    int responseTime;
+} Metrics;
+
 int main(int argc, char *argv[])
 {
     FILE *in;
@@ -25,6 +31,8 @@ int main(int argc, char *argv[])
     char *name;
     int priority;
     int burst;
+
+    int numTasks = 0;
 
     in = fopen(argv[1],"r");
     
@@ -38,12 +46,24 @@ int main(int argc, char *argv[])
         add(name,priority,burst);
 
         free(temp);
+
+        numTasks++;
     }
 
     fclose(in);
 
+    Metrics metrics = {0, 0, 0};
+
     // invoke the scheduler
-    schedule();
+    schedule(&metrics);
+
+    float turnaroundTime = (float)metrics.turnaroundTime / numTasks;
+    float waitingTime = (float)metrics.waitingTime / numTasks;
+    float responseTime = (float)metrics.responseTime / numTasks;
+
+    printf("Оборотное время: %.3f\n", turnaroundTime);
+    printf("Время ожидания: %.3f\n", waitingTime);
+    printf("Время отклика: %.3f\n", responseTime);
 
     return 0;
 }
