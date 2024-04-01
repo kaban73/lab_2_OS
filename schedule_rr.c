@@ -32,32 +32,41 @@ Task *pickTask() {
 
 void schedule(Metrics *metrics) {
     temp = head;
-    int fl = 0;
+    int fl_rt = 0;
+    int fl_tr = 0;
     int temp_turnaround = 0;
     while(head != NULL) {
         Task *task = pickTask();
         int currentTime = 0;
         while (task != NULL) {
+            if (fl_rt == 0)
+                metrics->responseTime += currentTime;
             if (QUANT >= task->burst) {
                 run(task, task->burst);
                 delete(&head, task);
 
                 currentTime += task->burst;
                 metrics->turnaroundTime += currentTime;
+                metrics->waitingTime += currentTime - task->burst;
             } else {
                 run(task, QUANT);
                 task->burst -= QUANT;
 
                 currentTime += QUANT;
                 metrics->turnaroundTime += currentTime;
+                metrics->waitingTime += currentTime - QUANT;
             }
             task = pickTask();
         }
+
+        printf("\nWaiting time: %d\n", metrics->waitingTime);
+
         temp = head;
-        if (fl == 0) {
+        if (fl_tr == 0) {
             temp_turnaround = metrics->turnaroundTime;
-            fl = 1;
+            fl_tr = 1;
         }
+        fl_rt = 1;
     }
     metrics->turnaroundTime += temp_turnaround;
 }
