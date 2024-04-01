@@ -30,17 +30,34 @@ Task *pickTask() {
     }
 }
 
-void schedule() {
+void schedule(Metrics *metrics) {
     temp = head;
     while(head != NULL) {
         Task *task = pickTask();
+        int currentTime = 0;
         while (task != NULL) {
             if (QUANT >= task->burst) {
+
+                metrics->responseTime += currentTime;
+
+                metrics->waitingTime += currentTime - task->burst;
+
                 run(task, task->burst);
+
+                currentTime += task->burst;
+                metrics->turnaroundTime += currentTime;
+
                 delete(&head, task);
             } else {
+                metrics->responseTime += currentTime;
+
+                metrics->waitingTime += currentTime - QUANT;
+
                 run(task, QUANT);
                 task->burst -= QUANT;
+
+                currentTime += QUANT;
+                metrics->turnaroundTime += currentTime;
             }
             task = pickTask();
         }
