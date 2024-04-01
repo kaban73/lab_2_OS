@@ -57,25 +57,45 @@ Task *pickTask() {
     }
 }
 
-void schedule_rr() {
+void schedule_rr(Metrics *metrics, int *currTime) {
     temp = head;
+    int fl_rt = 0;
+    int fl_tr = 0;
+    int temp_turnaround = 0;
     while(head != NULL) {
         Task *task = pickTask();
+        int currentTime = 0;
         while (task != NULL) {
+            if (fl_rt == 0)
+                metrics->responseTime += currentTime;
             if (QUANT >= task->burst) {
                 run(task, task->burst);
                 delete(&head, task);
+
+                currentTime += task->burst; currTime += task->burst;
+                metrics->turnaroundTime += currentTime;
+                metrics->waitingTime += currentTime - task->burst;
             } else {
                 run(task, QUANT);
                 task->burst -= QUANT;
+
+                currentTime += QUANT; currTime += QUANT;
+                metrics->turnaroundTime += currentTime;
+                metrics->waitingTime += currentTime - QUANT;
             }
             task = pickTask();
         }
         temp = head;
+        if (fl_tr == 0) {
+            temp_turnaround = metrics->turnaroundTime;
+            fl_tr = 1;
+        }
+        fl_rt = 1;
     }
+    metrics->turnaroundTime += temp_turnaround;
 }
 
-void schedule() {
+void schedule(Metrics *metrics) {
     pr_unsort = head;
     pr_sort = NULL;
 
@@ -87,9 +107,9 @@ void schedule() {
     }
 
     struct node *curr = pr_sort;
+    int currentTime = 0;
     while (curr != NULL) {
         Task *task = curr->task;
-
         if (priority_count[task->priority] > 1) {
             struct node *pr_temp = NULL;
             while (priority_count[task->priority] != 0) {
@@ -100,10 +120,16 @@ void schedule() {
                 curr = curr->next;
             }
             head = pr_temp;
-            schedule_rr();
+            schedule_rr(metrics, &currentTime);
         } else {
+            metrics->responseTime += currentTime;
+
             run(task, task->burst);
             curr = curr->next;
+
+            currentTime += task->burst;
+            metrics->turnaroundTime += currentTime;
+            metrics->waitingTime += currentTime - task->burst;
         }
     }
 }

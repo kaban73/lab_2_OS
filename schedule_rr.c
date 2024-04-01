@@ -58,9 +58,6 @@ void schedule(Metrics *metrics) {
             }
             task = pickTask();
         }
-
-        printf("\nWaiting time: %d\n", metrics->waitingTime);
-
         temp = head;
         if (fl_tr == 0) {
             temp_turnaround = metrics->turnaroundTime;
